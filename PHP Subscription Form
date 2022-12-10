@@ -1,0 +1,307 @@
+=================
+PHP HTML JS CODE:
+=================
+
+<?php
+$firstname = $lastname = $email = "";
+$fail = $preference = $validPreference = $preferenceResult = "";
+
+if(isset($_POST['submit']))
+{
+if (isset($_POST['firstname']))
+  $firstname = fix_string($_POST['firstname']);
+if (isset($_POST['lastname']))
+  $lastname = fix_string($_POST['lastname']);
+if (isset($_POST['email']))
+  $email = fix_string($_POST['email']);
+if(isset($_POST['chk']))
+  $preference = $_POST['chk'];
+	
+$fail  = validate_firstname($firstname);
+$fail .= validate_surname($lastname);
+$fail .= validate_email($email);
+$fail .= validate_Preference($preference);
+$validPreference = validate_Preference($preference);
+
+if($validPreference == "")
+$preferenceResult = getPreferences($preference);
+  
+echo "<!DOCTYPE html>\n<html><head><title>Subscription Form</title>";
+if ($fail == "")
+{
+echo <<<_END
+  <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <table id="successFormTbl" border="0" cellpadding="2" cellspacing="5">
+  <form method="post" action="Welcome.html"> 
+   <th colspan="2"><h2>FORM DATA SUCCESSFULLY VALIDATED</h2></th>
+   <tr>
+    <td>First name: </td>
+	<td>$firstname</td>
+   </tr>
+   <tr>
+    <td>Last name: </td>
+	<td>$lastname</td>
+   </tr>
+   <tr>
+    <td>Email: </td>
+	<td>$email</td>
+   </tr>
+   <tr>
+    <td>Preference: </td>
+	<td>$preferenceResult</td>
+   </tr>
+   <tr>
+   <td colspan="2" align="center"><input type="submit" value="Continue" id="btnContinue" class="btn">
+   </td>
+   <tr> 
+  </form> 
+  </table>  
+  </body></html>
+_END;
+exit;
+}
+}
+echo <<<_END
+	<link rel="stylesheet" href="style.css">
+  </head>
+   <body> 
+  <table id="subscriptionTbl" border="0" cellpadding="2" cellspacing="5">
+  <form method="post" action="addSubscription.php" onsubmit="return validate(this)">
+  <tr>
+   <td>
+     <fieldset class="container">
+     <legend class="heading">Information</legend>
+       <table id="informationtbl" border="0" cellpadding="2" cellspacing="5">
+         <tr>
+           <td>First name:</td>
+           <td><input type="text" class="text-Input" maxlength="32" name="firstname" value="$firstname"></td>
+           <td>Last name:</td>
+           <td><input type="text" class="text-Input" maxlength="32" name="lastname" value="$lastname"></td>
+         </tr>
+         <tr>
+           <td>Email:</td>
+           <td><input type="text" class="text-Input" maxlength="64" name="email" value="$email"></td>
+         </tr>
+         <tr>
+           <td colspan="4">
+		     The information you provide will be used in accordance with the terms of our <a href="">Privacy Policy</a>
+		   </td>
+         </tr>          
+        </table>
+      </fieldset>
+	</td>
+   </tr>
+   <tr>
+    <td>
+	  <fieldset class="container">
+	  <legend class="heading">Global Preferences</legend>
+	   <table id="GlobalPrefTbl" border="0" cellpadding="2" cellspacing="5">
+           <tr>
+		    <td><label for="chkUnsubscribe">Unsubscribe from all:</label></td>
+		    <td><input type="checkbox" name="chk[]" id="chkUnsubscribe" value="Unsubscribe"></td>
+		    <td><label for="chkSuspend">Suspend Email for 90 Days:</label></td>
+		    <td><input type="checkbox" name="chk[]" id="chkSuspend" value="Suspend Email(90 Days)"></td>
+		  </tr>
+		  <tr>
+		    <td><label for="chkDelete">Delete All My Information:</label></td>
+		    <td><input type="checkbox" name="chk[]" id="chkDelete" value="Delete All Information"></td>
+		  </tr>
+	   </table>	  	
+	  </fieldset>
+	</td>
+	</tr>
+	<tr>
+	  <td>
+	   Receive an email outside of these subscription parameters?
+      </td>
+	</tr>
+    <tr>
+      <td>	
+	   <a href="#">Contact Us</a> for more information on why you received this communication
+      </td>
+	</tr>
+	<tr>
+	  <td colspan="2" align="center">
+	     <p id="listError">$fail</p>
+	  </td>
+	</tr>
+    <tr>
+     <td colspan="2" align="center">		  
+	  <input type="submit" value="Submit" name="submit" class="btn">
+     </td>   
+    </tr>
+   </form>
+  </body>
+ </html>
+_END;
+
+function validate_Preference($field)
+{	
+	if($field == "") return "Please check at least 1 (ONE) preference";
+
+	return "";
+}
+
+function getPreferences($field)
+{
+ $prefResult = "";
+	foreach($field as $option)
+	{
+		$prefResult .= $option . "<br>";
+	}		
+	return $prefResult;
+}
+
+function validate_firstname($field)
+{
+  if($field == "") return "No first name was entered.<br>";
+  else if(preg_match("/[^a-zA-Z]/",$field))
+	return "Only letters (a-z,A-Z) are allowed for last name.<br>";
+  return "";
+}
+
+function validate_surname($field)
+{
+   if($field == "") return "No last name was entered.<br>";
+  else if(preg_match("/[^a-zA-Z]/",$field))
+	return "Only letters (a-z,A-Z) are allowed for surname.<br>";
+  return "";
+}
+ 
+ function validate_email($field)
+ {
+   if ($field == "") return "No Email was entered.<br>";
+   else if (!((strpos($field, ".") > 0) &&
+   (strpos($field, "@") > 0)) ||
+   preg_match("/[^a-zA-Z0-9.@_-]/", $field))
+   return "The Email address is invalid.<br>";
+   return "";
+ }
+ 
+ function fix_string($string)
+ {
+   $string = stripslashes($string);
+   return htmlentities ($string);
+ }
+?>
+
+=============
+CSS
+=============
+body
+{
+  background-color: lightgray;
+}
+
+#errorList
+{
+	display: none;
+	margin:0;
+	padding:0;
+	font-size: 14px;
+	color: red;
+	font-style: italic;
+}
+
+#listError
+{
+	margin:0;
+	padding:0;
+	font-size: 14px;
+	color: red;
+	font-style: italic;
+}
+
+*
+{
+   font-family: calibri;
+   color: #111;
+}
+
+.container
+{
+	font-size: 17px;
+}
+
+#subscriptionTbl{
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%,-50%);
+	width: 45em;
+	height: 30em;
+	padding: 14px;
+	background-color: #fff;
+	border-radius: 7px;
+	border-top: 5px solid #52d017;
+}
+
+h2{
+	font-size: 1.3em;
+}
+
+#successFormTbl
+{
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%,-50%);
+	width: 20em;
+	height: 15em;
+	padding: 14px;
+	background-color: #fff;
+	border-radius: 7px;
+	border-top: 5px solid #52d017;
+    font-size: 18px;
+}
+
+.heading
+{
+	font-size: 23px;
+	letter-spacing: 1px;
+}
+
+.text-Input{
+	width: 13em;
+	color: #111;
+	outline: none;
+	font-size: 16px;
+}
+
+.btn{
+	width: 10em;
+	height: 2em;
+	background: none;
+	color: #52d017;
+	font-size: 19px;
+	font-weight: 600;
+	border: 2px solid #52d017;
+	border-radius: 4px;
+}
+
+.btn:hover{
+	background: #52d017;
+	color: #fff;
+}
+
+a:link{
+	color: purple;
+}
+
+a:visited{
+	color: green;
+}
+
+a:hover{
+	color: hotpink;
+}
+
+a:active{
+	color: blue;
+}
+
+
+
+
